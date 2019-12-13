@@ -4,10 +4,15 @@
 #include <Windows.h>
 #include <shellapi.h>
 #include <iostream>
+#include <fstream>
 
 int main()
 {
-    std::cout << "Capturing process...\n";
+    using namespace std;
+    int time;
+    cout << "Enter the time for capturing (in seconds): ";
+    cin >> time;
+    time *= 1000;
 
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -39,8 +44,15 @@ int main()
     {
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
+        Sleep(time);
+        std::cout << "End\n";
+        fstream file("result.txt");
+        string a;
+        file >> a;
+        cout << a;
         return 0;
     }
+    cout << "end";
     return -1;
 }
 
