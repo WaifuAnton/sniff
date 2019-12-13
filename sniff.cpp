@@ -21,6 +21,10 @@ int main()
     cin >> time;
     time *= 1000;
 
+    string mob_ip;
+    cout << "Enter mobile ip: ";
+    cin >> mob_ip;
+
     remove("result.txt");
     fstream file;
 
@@ -54,11 +58,11 @@ int main()
     char ip[] = "ipconfig";
 
     if (CreateProcessA(NULL, ip, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
-    {     
+    {
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         Sleep(1000);
-        file.open("result.txt", ifstream::out | ifstream::in);       
+        file.open("result.txt", ifstream::out | ifstream::in);
         stringstream buffer;
         buffer << file.rdbuf();
         host_ip = buffer.str();
@@ -68,27 +72,29 @@ int main()
         host_ip = host_ip.substr(n, SIZE_IP);
         n = host_ip.find(":");
         int m = host_ip.length() - n;
-        host_ip = host_ip.substr(n, m);
-        cout << host_ip;      
+        host_ip = host_ip.substr(n + 2, m);
+        cout << "Host ip: " << host_ip << endl;
+        file.close();
     }
+    else
+        return -1;
 
-    char cmd[] = "tshark.exe -f tcp -i Wi-Fi";
-    if (CreateProcessA(NULL, cmd, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
+    cout << "Mobile ip" << mob_ip << endl;
+
+    char tshark[] = "tshark.exe -f tcp -i Wi-Fi";
+    if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
     {    
         Sleep(time);
         TerminateProcess(pi.hProcess, 0);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         std::cout << "End\n";
-        string a;
-        file >> a;
-        cout << a;
     }
     else
         return -1;
 
     //strcpy_s(cmd, )
-    return 1;
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
