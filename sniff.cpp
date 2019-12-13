@@ -41,10 +41,11 @@ int main()
 
     char cmd[] = "tshark.exe -i Wi-Fi";
     if (CreateProcessA(NULL, cmd, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
-    {
+    {    
+        Sleep(time);
+        TerminateProcess(pi.hProcess, 0);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
-        Sleep(time);
         std::cout << "End\n";
         fstream file("result.txt");
         string a;
