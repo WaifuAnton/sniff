@@ -79,7 +79,7 @@ int main()
     else
         return -1;
 
-    cout << "Mobile ip" << mob_ip << endl;
+    cout << "Mobile ip: " << mob_ip << endl;
 
     char tshark[] = "tshark.exe -f tcp -i Wi-Fi";
     if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
@@ -92,6 +92,17 @@ int main()
     }
     else
         return -1;
+
+    file.open("result.txt");
+    int SYN = 0;
+    string str;
+    while (!file.eof())
+    {
+        file >> str;
+        if (str.find("SYN") != string::npos)
+            SYN++;
+    }
+    cout << SYN << endl;
 
     //strcpy_s(cmd, )
     return 0;
