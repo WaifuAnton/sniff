@@ -14,6 +14,7 @@ int main()
 {
     using namespace std;
     const int SIZE = 293;
+    const int SIZE_IP = 49;
     
     int time;
     cout << "Enter the time for capturing (in seconds): ";
@@ -22,6 +23,8 @@ int main()
 
     remove("result.txt");
     fstream file;
+
+    string host_ip;
 
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -55,15 +58,18 @@ int main()
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         Sleep(1000);
-        file.open("result.txt", ifstream::out | ifstream::in);
-        string str;
+        file.open("result.txt", ifstream::out | ifstream::in);       
         stringstream buffer;
         buffer << file.rdbuf();
-        str = buffer.str();
-        int n = str.find("Wireless LAN adapter Wi-Fi:");
-        str = str.substr(n, SIZE);
-        n = str.find("IPv4 Address");
-        cout << str;      
+        host_ip = buffer.str();
+        int n = host_ip.find("Wireless LAN adapter Wi-Fi:");
+        host_ip = host_ip.substr(n, SIZE);
+        n = host_ip.find("IPv4 Address");
+        host_ip = host_ip.substr(n, SIZE_IP);
+        n = host_ip.find(":");
+        int m = host_ip.length() - n;
+        host_ip = host_ip.substr(n, m);
+        cout << host_ip;      
     }
 
     char cmd[] = "tshark.exe -f tcp -i Wi-Fi";
