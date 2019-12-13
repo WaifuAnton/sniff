@@ -3,16 +3,25 @@
 
 #include <Windows.h>
 #include <shellapi.h>
+#include <stdio.h>
+
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream>
 
 int main()
 {
     using namespace std;
+    const int SIZE = 293;
+    
     int time;
     cout << "Enter the time for capturing (in seconds): ";
     cin >> time;
     time *= 1000;
+
+    remove("result.txt");
+    fstream file;
 
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -39,7 +48,25 @@ int main()
     si.dwFlags |= STARTF_USESTDHANDLES;
     si.wShowWindow = SW_SHOWDEFAULT;
 
-    char cmd[] = "tshark.exe -i Wi-Fi";
+    char ip[] = "ipconfig";
+
+    if (CreateProcessA(NULL, ip, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
+    {     
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+        Sleep(1000);
+        file.open("result.txt", ifstream::out | ifstream::in);
+        string str;
+        stringstream buffer;
+        buffer << file.rdbuf();
+        str = buffer.str();
+        int n = str.find("Wireless LAN adapter Wi-Fi:");
+        str = str.substr(n, SIZE);
+        n = str.find("IPv4 Address");
+        cout << str;      
+    }
+
+    char cmd[] = "tshark.exe -f tcp -i Wi-Fi";
     if (CreateProcessA(NULL, cmd, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
     {    
         Sleep(time);
@@ -47,14 +74,15 @@ int main()
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
         std::cout << "End\n";
-        fstream file("result.txt");
         string a;
         file >> a;
         cout << a;
-        return 0;
     }
-    cout << "end";
-    return -1;
+    else
+        return -1;
+
+    //strcpy_s(cmd, )
+    return 1;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

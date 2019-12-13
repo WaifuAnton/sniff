@@ -78,6 +78,9 @@ StyleCopReport.xml
 *.pgc
 *.pgd
 *.rsp
+
+#result file
+result.txt
 *.sbr
 *.tlb
 *.tli
