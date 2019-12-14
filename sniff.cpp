@@ -9,14 +9,16 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 std::string get_ip(std::string input, std::string search);
 
 int main()
 {
     using namespace std;
+    fstream file;
     
-    int time;
+    /*int time;
     cout << "Enter the time for capturing (in seconds): ";
     cin >> time;
     time *= 1000; 
@@ -26,6 +28,7 @@ int main()
 
     string host_ip;
     string mob_ip;
+    vector<string> ips;
 
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -65,7 +68,8 @@ int main()
         host_ip = buffer.str();
         mob_ip = buffer.str();
         host_ip = get_ip(host_ip, "Wireless LAN adapter Wi-Fi:");
-        mob_ip = get_ip(mob_ip, "* 2:");       
+        mob_ip = get_ip(mob_ip, "* 2:");
+        ips.push_back(mob_ip);
         file.close();
     }
     else
@@ -80,7 +84,7 @@ int main()
         CloseHandle(pi.hProcess);
     }
     else
-        return -1;
+        return -1;*/
 
     file.open("result.txt");
     int SYN = 0;
@@ -93,19 +97,31 @@ int main()
     }
     file.clear();
     file.seekg(0, ios_base::beg);
+    vector<string> ips;
+    string mob_ip = "192.168.137.1";
+    ips.push_back(mob_ip);
     string temp = mob_ip.substr(0, mob_ip.find_last_of('.'));
+    int i = 0;
     while (!file.eof())
     {
         file >> str;
-        if (str.find(temp) != string::npos && str != mob_ip)
+        bool equals = false;
+        for (string ip : ips)
+            if (str._Equal(ip))
+            {
+                equals = true;
+                break;
+            }
+        if (str.find(temp) != string::npos && !equals)
         {
-            mob_ip = str;
-            break;
+            ips.push_back(str);
+            i++;
         }
     }
     file.close();
-    cout << "Host ip: " << host_ip << endl;
-    cout << "Mob ip: " << mob_ip << endl;
+    //cout << "Host ip: " << host_ip << endl;
+    for (string str : ips)
+        cout << str << endl;
     cout << "Number of SYN: " << SYN << endl;
     return 0;
 }
