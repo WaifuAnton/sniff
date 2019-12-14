@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <limits>
+#include <map>
 
 std::string get_ip(std::string input, std::string search);
 std::fstream& GotoLine(std::fstream& file, unsigned int num);
@@ -89,12 +90,15 @@ int main()
         return -1;
   
     string str;
-    vector<string> tmp;
+    vector<string> tmp;   
     file.open("result.txt");
     GotoLine(file, 55);
     while (getline(file, str))
         tmp.push_back(str.substr(8, str.size() - 8));
+
     vector<string> words;
+    map<string, int> syns;
+    int syn = 0;
     for (int j = 0; j < tmp.size() - 1; j++)
     {
         string word = "";
@@ -116,24 +120,29 @@ int main()
         {
             ports.push_back(words.at(6));
             ports.push_back(words.at(8));
+            if (words.at(9)._Equal("[SYN]"))
+                syns[words.at(1)] = ++syn;
         }
         words.clear();
     }
+
     vector<string> ports_total;
     for (int i = 0; i < ports.size(); i++)
         if (isdigit(ports.at(i).data()[0]))
             ports_total.push_back(ports.at(i));
     file.clear();
     file.seekg(0, ios_base::beg);
+
     int SYN = 0;  
     while (!file.eof())
     {
         file >> str;
-        if (str.find("SYN") != string::npos)
+        if (str.find("[SYN]") != string::npos)
             SYN++;
     }
     file.clear();
     file.seekg(0, ios_base::beg);
+
     string temp = mob_ip.substr(0, mob_ip.find_last_of('.'));
     while (!file.eof())
     {
@@ -149,14 +158,16 @@ int main()
             ips.push_back(str);
     }
     file.close();
-    //cout << "Host ip: " << host_ip << endl;
-    cout << "Ports\n";
+
+    cout << "Ports:\n";
     for (string port : ports_total)
         cout << port << endl;
     cout << endl;
     for (int i = 1; i < ips.size(); i++)
         cout << ips[i] << endl;
     cout << "Number of SYN: " << SYN << endl;
+    for (auto s = syns.cbegin(); s != syns.cend(); s++)
+        cout << s->first << ": " << s->second << endl;
     return 0;
 }
 
