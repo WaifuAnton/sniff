@@ -10,8 +10,10 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <limits>
 
 std::string get_ip(std::string input, std::string search);
+std::fstream& GotoLine(std::fstream& file, unsigned int num);
 
 int main()
 {
@@ -84,10 +86,19 @@ int main()
     }
     else
         return -1;
-
-    file.open("result.txt");
-    int SYN = 0;
+  
     string str;
+    file.open("result.txt");
+    GotoLine(file, 55);
+    int i = 54;
+    while (getline(file, str))
+    {
+        cout << ++i << endl;
+    }
+
+    file.clear();
+    file.seekg(0, ios_base::beg);
+    int SYN = 0;  
     while (!file.eof())
     {
         file >> str;
@@ -131,6 +142,14 @@ std::string get_ip(std::string input, std::string search)
     int m = result.length() - n;
     result = result.substr(n + 2, m);
     return result;
+}
+
+std::fstream& GotoLine(std::fstream& file, unsigned int num) {
+    file.seekg(std::ios::beg);
+    for (int i = 0; i < num - 1; ++i) {
+        file.ignore(256, '\n');
+    }
+    return file;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
