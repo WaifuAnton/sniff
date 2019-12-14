@@ -9,26 +9,26 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <locale>;
 
 int main()
 {
     using namespace std;
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
     const int SIZE = 293;
     const int SIZE_IP = 49;
     
     int time;
     cout << "Enter the time for capturing (in seconds): ";
     cin >> time;
-    time *= 1000;
-
-    string mob_ip;
-    cout << "Enter mobile ip: ";
-    cin >> mob_ip;
+    time *= 1000; 
 
     remove("result.txt");
     fstream file;
 
     string host_ip;
+    string mob_ip;
 
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -66,6 +66,7 @@ int main()
         stringstream buffer;
         buffer << file.rdbuf();
         host_ip = buffer.str();
+        mob_ip = buffer.str();
         int n = host_ip.find("Wireless LAN adapter Wi-Fi:");
         host_ip = host_ip.substr(n, SIZE);
         n = host_ip.find("IPv4 Address");
@@ -74,6 +75,14 @@ int main()
         int m = host_ip.length() - n;
         host_ip = host_ip.substr(n + 2, m);
         cout << "Host ip: " << host_ip << endl;
+        n = mob_ip.find("2:");
+        mob_ip = mob_ip.substr(n, SIZE);
+        n = mob_ip.find("IPv4 Address");
+        mob_ip = mob_ip.substr(n, SIZE_IP);
+        n = mob_ip.find(":");
+        m = mob_ip.length() - n;
+        mob_ip = mob_ip.substr(n + 2, m);
+        cout << mob_ip << endl;
         file.close();
     }
     else
