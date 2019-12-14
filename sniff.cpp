@@ -9,15 +9,12 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <locale>;
+
+std::string get_ip(std::string input, std::string search);
 
 int main()
 {
     using namespace std;
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-    const int SIZE = 293;
-    const int SIZE_IP = 49;
     
     int time;
     cout << "Enter the time for capturing (in seconds): ";
@@ -67,37 +64,20 @@ int main()
         buffer << file.rdbuf();
         host_ip = buffer.str();
         mob_ip = buffer.str();
-        int n = host_ip.find("Wireless LAN adapter Wi-Fi:");
-        host_ip = host_ip.substr(n, SIZE);
-        n = host_ip.find("IPv4 Address");
-        host_ip = host_ip.substr(n, SIZE_IP);
-        n = host_ip.find(":");
-        int m = host_ip.length() - n;
-        host_ip = host_ip.substr(n + 2, m);
-        cout << "Host ip: " << host_ip << endl;
-        n = mob_ip.find("2:");
-        mob_ip = mob_ip.substr(n, SIZE);
-        n = mob_ip.find("IPv4 Address");
-        mob_ip = mob_ip.substr(n, SIZE_IP);
-        n = mob_ip.find(":");
-        m = mob_ip.length() - n;
-        mob_ip = mob_ip.substr(n + 2, m);
-        cout << mob_ip << endl;
+        host_ip = get_ip(host_ip, "Wireless LAN adapter Wi-Fi:");
+        mob_ip = get_ip(mob_ip, "* 2:");       
         file.close();
     }
     else
         return -1;
 
-    cout << "Mobile ip: " << mob_ip << endl;
-
-    char tshark[] = "tshark.exe -f tcp -i Wi-Fi";
+    char tshark[] = "tshark.exe -f tcp -i \"Підключення через локальну мережу* 2\"";
     if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
     {    
         Sleep(time);
         TerminateProcess(pi.hProcess, 0);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
-        std::cout << "End\n";
     }
     else
         return -1;
@@ -111,10 +91,38 @@ int main()
         if (str.find("SYN") != string::npos)
             SYN++;
     }
-    cout << SYN << endl;
-
-    //strcpy_s(cmd, )
+    file.clear();
+    file.seekg(0, ios_base::beg);
+    string temp = mob_ip.substr(0, mob_ip.find_last_of('.'));
+    while (!file.eof())
+    {
+        file >> str;
+        if (str.find(temp) != string::npos && str != mob_ip)
+        {
+            mob_ip = str;
+            break;
+        }
+    }
+    file.close();
+    cout << "Host ip: " << host_ip << endl;
+    cout << "Mob ip: " << mob_ip << endl;
+    cout << "Number of SYN: " << SYN << endl;
     return 0;
+}
+
+std::string get_ip(std::string input, std::string search)
+{
+    const int SIZE = 293;
+    const int SIZE_IP = 49;
+    std::string result;
+    int n = input.find(search);
+    result = input.substr(n, SIZE);
+    n = result.find("IPv4 Address");
+    result = result.substr(n, SIZE_IP);
+    n = result.find(":");
+    int m = result.length() - n;
+    result = result.substr(n + 2, m);
+    return result;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
