@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <shellapi.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include <iostream>
 #include <fstream>
@@ -30,6 +31,7 @@ int main()
     string host_ip;
     string mob_ip;
     vector<string> ips;
+    vector<string> ports;
 
     SECURITY_ATTRIBUTES sa;
     sa.nLength = sizeof(sa);
@@ -79,7 +81,7 @@ int main()
     char tshark[] = "tshark.exe -f tcp -i \"Підключення через локальну мережу* 2\"";
     if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
     {    
-        Sleep(time);
+        Sleep(time + 200);
         TerminateProcess(pi.hProcess, 0);
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
@@ -88,14 +90,36 @@ int main()
         return -1;
   
     string str;
+    vector<string> tmp;
     file.open("result.txt");
     GotoLine(file, 55);
-    int i = 54;
     while (getline(file, str))
+        tmp.push_back(str.substr(8, str.size() - 8));
+    vector<string> words;
+    for (string line : tmp)
     {
-        cout << ++i << endl;
+        string word = "";
+        for (int i = 0; i <= line.size(); i++)
+        {
+            if (line[i] == ' ')
+            {               
+                words.push_back(word);
+                word = "";
+            }
+            else
+                word += line[i];
+        }
+        if (words.size() <= 8)
+            ports.push_back(words.at(5));
+        else
+        {
+            ports.push_back(words.at(5));
+            ports.push_back(words.at(6));
+        }
+        if (!isdigit((ports.at(ports.size() - 1)).data()[0]))
+            ports.pop_back();
+        words.clear();
     }
-
     file.clear();
     file.seekg(0, ios_base::beg);
     int SYN = 0;  
@@ -123,6 +147,10 @@ int main()
     }
     file.close();
     //cout << "Host ip: " << host_ip << endl;
+    cout << "Ports\n";
+    for (string port : ports)
+        cout << port << endl;
+    cout << endl;
     for (int i = 1; i < ips.size(); i++)
         cout << ips[i] << endl;
     cout << "Number of SYN: " << SYN << endl;
