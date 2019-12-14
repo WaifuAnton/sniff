@@ -4,7 +4,6 @@
 #include <Windows.h>
 #include <shellapi.h>
 #include <stdio.h>
-#include <ctype.h>
 
 #include <iostream>
 #include <fstream>
@@ -96,30 +95,34 @@ int main()
     while (getline(file, str))
         tmp.push_back(str.substr(8, str.size() - 8));
     vector<string> words;
-    for (string line : tmp)
+    for (int j = 0; j < tmp.size() - 1; j++)
     {
         string word = "";
-        for (int i = 0; i <= line.size(); i++)
+        for (int i = 0; i < tmp[j].size(); i++)
         {
-            if (line[i] == ' ')
+            if (tmp[j][i] == ' ')
             {               
                 words.push_back(word);
                 word = "";
             }
             else
-                word += line[i];
+                word += tmp[j][i];
         }
+        if (!words.size())
+            continue;
         if (words.size() <= 8)
-            ports.push_back(words.at(5));
+            ports.push_back(words.at(6));
         else
         {
-            ports.push_back(words.at(5));
             ports.push_back(words.at(6));
+            ports.push_back(words.at(8));
         }
-        if (!isdigit((ports.at(ports.size() - 1)).data()[0]))
-            ports.pop_back();
         words.clear();
     }
+    vector<string> ports_total;
+    for (int i = 0; i < ports.size(); i++)
+        if (isdigit(ports.at(i).data()[0]))
+            ports_total.push_back(ports.at(i));
     file.clear();
     file.seekg(0, ios_base::beg);
     int SYN = 0;  
@@ -148,7 +151,7 @@ int main()
     file.close();
     //cout << "Host ip: " << host_ip << endl;
     cout << "Ports\n";
-    for (string port : ports)
+    for (string port : ports_total)
         cout << port << endl;
     cout << endl;
     for (int i = 1; i < ips.size(); i++)
