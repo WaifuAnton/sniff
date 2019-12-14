@@ -16,9 +16,8 @@ std::string get_ip(std::string input, std::string search);
 int main()
 {
     using namespace std;
-    fstream file;
     
-    /*int time;
+    int time;
     cout << "Enter the time for capturing (in seconds): ";
     cin >> time;
     time *= 1000; 
@@ -84,7 +83,7 @@ int main()
         CloseHandle(pi.hProcess);
     }
     else
-        return -1;*/
+        return -1;
 
     file.open("result.txt");
     int SYN = 0;
@@ -97,11 +96,7 @@ int main()
     }
     file.clear();
     file.seekg(0, ios_base::beg);
-    vector<string> ips;
-    string mob_ip = "192.168.137.1";
-    ips.push_back(mob_ip);
     string temp = mob_ip.substr(0, mob_ip.find_last_of('.'));
-    int i = 0;
     while (!file.eof())
     {
         file >> str;
@@ -113,15 +108,12 @@ int main()
                 break;
             }
         if (str.find(temp) != string::npos && !equals)
-        {
             ips.push_back(str);
-            i++;
-        }
     }
     file.close();
     //cout << "Host ip: " << host_ip << endl;
-    for (string str : ips)
-        cout << str << endl;
+    for (int i = 1; i < ips.size(); i++)
+        cout << ips[i] << endl;
     cout << "Number of SYN: " << SYN << endl;
     return 0;
 }
