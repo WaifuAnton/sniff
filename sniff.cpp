@@ -116,8 +116,7 @@ int main()
     GotoLine(file, 55);
     while (getline(file, str))
         tmp.push_back(str.substr(8, str.size() - 8));
-
-    vector<string> words;
+    
     map<string, vector<string>> sites;
     map<string, int> syns;
     map<string, vector<string>> flood;
@@ -126,6 +125,7 @@ int main()
     int syn = 0, syn_all = 0;
     for (int i = 0; i < tmp.size() - 1; i++)
     {
+        vector<string> words;
         string word = "";
         for (int j = 0; j < tmp[i].size(); j++)
         {
@@ -158,7 +158,6 @@ int main()
             syn_all++;
             flood[words.at(1)].push_back(words.at(3));
         }
-        words.clear();
     }
 
     vector<string> ports_total;
