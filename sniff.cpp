@@ -55,12 +55,12 @@ int main()
     si.hStdInput = NULL;
     si.hStdError = h;
     si.hStdOutput = h;
-    si.dwFlags |= STARTF_USESTDHANDLES;
+    si.dwFlags = STARTF_USESTDHANDLES;
     si.wShowWindow = SW_SHOWDEFAULT;
 
     char ip[] = "ipconfig";
 
-    if (CreateProcessA(NULL, ip, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
+    if (CreateProcessA(NULL, ip, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\Практ1\\sniff", &si, &pi))
     {
         CloseHandle(pi.hThread);
         CloseHandle(pi.hProcess);
@@ -76,10 +76,14 @@ int main()
         file.close();
     }
     else
+    {
+        DWORD rc = GetLastError();
+        cout << rc;
         return -1;
+    }
 
     char tshark[] = "tshark.exe -i \"Підключення через локальну мережу* 2\"";
-    if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
+    if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\Практ1\\sniff", &si, &pi))
     {    
         Sleep(time + 200);
         TerminateProcess(pi.hProcess, 0);
@@ -140,10 +144,10 @@ int main()
                 word += tmp[i][j];
         }
         if (!words.size())
-            continue;    
-        ports.push_back(words.at(6));
+            continue;            
         if (words.size() > 9)
-        {            
+        {        
+            ports.push_back(words.at(6));
             ports.push_back(words.at(8));
             if (words.at(4)._Equal("DNS") && words.at(8)._Equal("response"))
                 sites.push_back(words.at(11));
@@ -175,12 +179,11 @@ int main()
         cout << ips[i] << "; ";
     cout << endl << endl;
     for (string site : sites)
-        cout << site << "; ";
-    cout << endl << endl;
+        cout << site << endl;
+    cout << endl;
     cout << "Number of SYN: " << syn_all << endl;
     for (auto s = syns.cbegin(); s != syns.cend(); s++)
         cout << s->first << ": " << s->second << endl;
-    cout << endl;
     for (auto f = flood.cbegin(); f != flood.cend(); f++)
         cout << f->first << " --> " << f->second << endl;
     return 0;
