@@ -89,8 +89,25 @@ int main()
     else
         return -1;
   
+    file.open("result.txt");
     string str;
-    vector<string> tmp;   
+    string temp = mob_ip.substr(0, mob_ip.find_last_of('.'));
+    while (!file.eof())
+    {
+        file >> str;
+        bool equals = false;
+        for (string ip : ips)
+            if (str._Equal(ip))
+            {
+                equals = true;
+                break;
+            }
+        if (str.find(temp) != string::npos && !equals)
+            ips.push_back(str);
+    }
+    file.close();
+
+    vector<string> tmp;
     file.open("result.txt");
     GotoLine(file, 55);
     while (getline(file, str))
@@ -98,7 +115,10 @@ int main()
 
     vector<string> words;
     map<string, int> syns;
-    int syn = 0;
+    for (int i = 1; i < ips.size(); i++)
+        syns[ips.at(i)] = 0;
+
+    int syn = 0, syn_all = 0;
     for (int j = 0; j < tmp.size() - 1; j++)
     {
         string word = "";
@@ -120,8 +140,10 @@ int main()
         {
             ports.push_back(words.at(6));
             ports.push_back(words.at(8));
-            if (words.at(9)._Equal("[SYN]"))
-                syns[words.at(1)] = ++syn;
+            if (!words.at(9)._Equal("[SYN]"))
+                continue;
+            syns[words.at(1)]++;
+            syn_all++;
         }
         words.clear();
     }
@@ -130,42 +152,16 @@ int main()
     for (int i = 0; i < ports.size(); i++)
         if (isdigit(ports.at(i).data()[0]))
             ports_total.push_back(ports.at(i));
-    file.clear();
-    file.seekg(0, ios_base::beg);
-
-    int SYN = 0;  
-    while (!file.eof())
-    {
-        file >> str;
-        if (str.find("[SYN]") != string::npos)
-            SYN++;
-    }
-    file.clear();
-    file.seekg(0, ios_base::beg);
-
-    string temp = mob_ip.substr(0, mob_ip.find_last_of('.'));
-    while (!file.eof())
-    {
-        file >> str;
-        bool equals = false;
-        for (string ip : ips)
-            if (str._Equal(ip))
-            {
-                equals = true;
-                break;
-            }
-        if (str.find(temp) != string::npos && !equals)
-            ips.push_back(str);
-    }
     file.close();
 
     cout << "Ports:\n";
     for (string port : ports_total)
-        cout << port << endl;
+        cout << port << " ";
     cout << endl;
     for (int i = 1; i < ips.size(); i++)
-        cout << ips[i] << endl;
-    cout << "Number of SYN: " << SYN << endl;
+        cout << ips[i] << "; ";
+    cout << endl;
+    cout << "Number of SYN: " << syn_all << endl;
     for (auto s = syns.cbegin(); s != syns.cend(); s++)
         cout << s->first << ": " << s->second << endl;
     return 0;
@@ -188,9 +184,8 @@ std::string get_ip(std::string input, std::string search)
 
 std::fstream& GotoLine(std::fstream& file, unsigned int num) {
     file.seekg(std::ios::beg);
-    for (int i = 0; i < num - 1; ++i) {
+    for (int i = 0; i < num - 1; ++i)
         file.ignore(256, '\n');
-    }
     return file;
 }
 
