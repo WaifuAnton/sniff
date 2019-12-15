@@ -78,7 +78,7 @@ int main()
     else
         return -1;
 
-    char tshark[] = "tshark.exe -f tcp -i \"Підключення через локальну мережу* 2\"";
+    char tshark[] = "tshark.exe -i \"Підключення через локальну мережу* 2\"";
     if (CreateProcessA(NULL, tshark, NULL, NULL, TRUE, 0, NULL, "C:\\Users\\makar\\Desktop\\Універ\\3 курс\\Мережі\\Звіти\\sniff", &si, &pi))
     {    
         Sleep(time + 200);
@@ -97,7 +97,7 @@ int main()
         file >> str;
         bool equals = false;
         for (string ip : ips)
-            if (str._Equal(ip))
+            if (str._Equal(ip) || str.data()[str.size() - 1] == '?')
             {
                 equals = true;
                 break;
@@ -114,56 +114,75 @@ int main()
         tmp.push_back(str.substr(8, str.size() - 8));
 
     vector<string> words;
+    vector<string> sites;
     map<string, int> syns;
+    map<string, string> flood;
     for (int i = 1; i < ips.size(); i++)
         syns[ips.at(i)] = 0;
-
     int syn = 0, syn_all = 0;
-    for (int j = 0; j < tmp.size() - 1; j++)
+    for (int i = 0; i < tmp.size() - 1; i++)
     {
         string word = "";
-        for (int i = 0; i < tmp[j].size(); i++)
+        for (int j = 0; j < tmp[i].size(); j++)
         {
-            if (tmp[j][i] == ' ')
+            if (j == tmp[i].size() - 1)
+            {
+                word += tmp[i][j];
+                words.push_back(word);
+                word = "";
+            }
+            else if (tmp[i][j] == ' ')
             {               
                 words.push_back(word);
                 word = "";
             }
             else
-                word += tmp[j][i];
+                word += tmp[i][j];
         }
         if (!words.size())
-            continue;
-        if (words.size() <= 8)
-            ports.push_back(words.at(6));
-        else
-        {
-            ports.push_back(words.at(6));
+            continue;    
+        ports.push_back(words.at(6));
+        if (words.size() > 9)
+        {            
             ports.push_back(words.at(8));
+            if (words.at(4)._Equal("DNS") && words.at(8)._Equal("response"))
+                sites.push_back(words.at(11));
             if (!words.at(9)._Equal("[SYN]"))
+            {
+                words.clear();
                 continue;
+            }
             syns[words.at(1)]++;
             syn_all++;
+            flood[words.at(1)] = words.at(3);
         }
         words.clear();
     }
 
     vector<string> ports_total;
     for (int i = 0; i < ports.size(); i++)
-        if (isdigit(ports.at(i).data()[0]))
+        if (isdigit((unsigned char)ports.at(i).data()[0]))
             ports_total.push_back(ports.at(i));
     file.close();
 
+
+    cout << "Host ip: " << ips.at(0) << endl << endl;
     cout << "Ports:\n";
     for (string port : ports_total)
         cout << port << " ";
-    cout << endl;
+    cout << endl << endl;
     for (int i = 1; i < ips.size(); i++)
         cout << ips[i] << "; ";
-    cout << endl;
+    cout << endl << endl;
+    for (string site : sites)
+        cout << site << "; ";
+    cout << endl << endl;
     cout << "Number of SYN: " << syn_all << endl;
     for (auto s = syns.cbegin(); s != syns.cend(); s++)
         cout << s->first << ": " << s->second << endl;
+    cout << endl;
+    for (auto f = flood.cbegin(); f != flood.cend(); f++)
+        cout << f->first << " --> " << f->second << endl;
     return 0;
 }
 
