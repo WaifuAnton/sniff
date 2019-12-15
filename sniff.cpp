@@ -163,7 +163,6 @@ int main()
             ports_total.push_back(ports.at(i));
     file.close();
 
-
     cout << "Host ip: " << ips.at(0) << endl << endl;
     cout << "Connected ips:" << endl;
     for (int i = 1; i < ips.size(); i++)
@@ -209,7 +208,8 @@ std::string get_ip(std::string input, std::string search)
     return result;
 }
 
-std::fstream& GotoLine(std::fstream& file, unsigned int num) {
+std::fstream& GotoLine(std::fstream& file, unsigned int num) 
+{
     file.seekg(std::ios::beg);
     for (int i = 0; i < num - 1; ++i)
         file.ignore(256, '\n');
