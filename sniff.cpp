@@ -118,9 +118,9 @@ int main()
         tmp.push_back(str.substr(8, str.size() - 8));
 
     vector<string> words;
-    vector<string> sites;
+    map<string, vector<string>> sites;
     map<string, int> syns;
-    map<string, string> flood;
+    map<string, vector<string>> flood;
     for (int i = 1; i < ips.size(); i++)
         syns[ips.at(i)] = 0;
     int syn = 0, syn_all = 0;
@@ -142,15 +142,13 @@ int main()
             }
             else
                 word += tmp[i][j];
-        }
-        if (!words.size())
-            continue;            
+        }         
         if (words.size() > 9)
         {        
             ports.push_back(words.at(6));
             ports.push_back(words.at(8));
             if (words.at(4)._Equal("DNS") && words.at(8)._Equal("response"))
-                sites.push_back(words.at(11));
+                sites[words.at(3)].push_back(words.at(11));
             if (!words.at(9)._Equal("[SYN]"))
             {
                 words.clear();
@@ -158,34 +156,45 @@ int main()
             }
             syns[words.at(1)]++;
             syn_all++;
-            flood[words.at(1)] = words.at(3);
+            flood[words.at(1)].push_back(words.at(3));
         }
         words.clear();
     }
 
     vector<string> ports_total;
     for (int i = 0; i < ports.size(); i++)
-        if (isdigit((unsigned char)ports.at(i).data()[0]))
+        if (isdigit((unsigned char)ports.at(i).data()[0]) && ports.at(i).size() < 5)
             ports_total.push_back(ports.at(i));
     file.close();
 
 
     cout << "Host ip: " << ips.at(0) << endl << endl;
+    cout << "Connected ips:" << endl;
+    for (int i = 1; i < ips.size(); i++)
+        cout << ips[i] << endl;
+    cout << endl;
     cout << "Ports:\n";
     for (string port : ports_total)
         cout << port << " ";
-    cout << endl << endl;
-    for (int i = 1; i < ips.size(); i++)
-        cout << ips[i] << "; ";
-    cout << endl << endl;
-    for (string site : sites)
-        cout << site << endl;
+    cout << endl << endl;    
+    for (auto s = sites.cbegin(); s != sites.cend(); s++)
+    {
+        cout << s->first << " sites:\n";
+        for (int i = 0; i < s->second.size(); i++)
+            cout << s->second.at(i) << endl;
+    }
     cout << endl;
-    cout << "Number of SYN: " << syn_all << endl;
     for (auto s = syns.cbegin(); s != syns.cend(); s++)
-        cout << s->first << ": " << s->second << endl;
+        cout << s->first << " SYNs: " << s->second << endl;
+    cout << endl;
     for (auto f = flood.cbegin(); f != flood.cend(); f++)
-        cout << f->first << " --> " << f->second << endl;
+    {
+        cout << f->first << endl;
+        for (int i = 0; i < f->second.size(); i++)
+            cout << "--> " << f->second.at(i) << endl;
+    }
+    cout << endl;
+    cout << "Total number of SYNs: " << syn_all << endl;
     return 0;
 }
 
