@@ -150,10 +150,7 @@ int main()
             if (words.at(4)._Equal("DNS") && words.at(8)._Equal("response"))
                 sites[words.at(3)].push_back(words.at(11));
             if (!words.at(9)._Equal("[SYN]"))
-            {
-                words.clear();
                 continue;
-            }
             syns[words.at(1)]++;
             syn_all++;
             flood[words.at(1)].push_back(words.at(3));
